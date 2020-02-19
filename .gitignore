@@ -1,10 +1,8 @@
+.vscode/
+
+course 1/*
+
 *
+!*.cpp
 
-# Unignore all with extensions
-!*.*
-!.*
-
-# Unignore all dirs
 !*/
-
-.vscode
