@@ -101,16 +101,16 @@ ostream& operator<<(ostream& os, const Rational& output) {
     return os;
 }
 
-istream& operator>>(istream& is, Rational& input) {
+
+istream& operator>>(istream& istr, Rational& input) {
     int numerator, denominator;
-    if (is) {
-        is >> numerator;
-        is.ignore(1);
-        is >> denominator;
-        is.ignore(1);
+    char drob;
+    istr >> numerator >> drob >> denominator;
+    if (istr && drob == '/') {
         input = {numerator, denominator};
     }
-    return is;
+
+    return istr;
 }
 // Реализуйте для класса Rational оператор(ы), необходимые для использования его
 // в качестве ключа map'а и элемента set'а
