@@ -6,16 +6,20 @@
 #include <set>
 #include <iomanip>
 using namespace std;
-class Date {
+class Date
+{
 public:
-  Date() { }
-  Date(const int& new_year, const int& new_month, const int& new_day) {
-    if (new_month < 1 || new_month > 12) {
+  Date() {}
+  Date(const int &new_year, const int &new_month, const int &new_day)
+  {
+    if (new_month < 1 || new_month > 12)
+    {
       string err = "Month value is invalid: " + to_string(new_month);
       throw runtime_error(err);
     }
-    
-    if (new_day < 1 || new_day > 31) {
+
+    if (new_day < 1 || new_day > 31)
+    {
       string err = "Day value is invalid: " + to_string(new_day);
       throw runtime_error(err);
     }
@@ -23,39 +27,55 @@ public:
     month = new_month;
     day = new_day;
   }
-  int GetYear() const {
+  int GetYear() const
+  {
     return year;
   }
-  int GetMonth() const {
+  int GetMonth() const
+  {
     return month;
   }
-  int GetDay() const {
+  int GetDay() const
+  {
     return day;
   }
+
 private:
   int year;
   int month;
   int day;
 };
 
-ostream& operator<<(ostream& ostr, const Date& d) {
-  char divider = '-'; 
-  ostr << setw(4) << setfill('0') << d.GetYear() << divider <<
-    setw(2) << setfill('0') << d.GetMonth() << divider <<
-    setw(2) << setfill('0') << d.GetDay();
+ostream &operator<<(ostream &ostr, const Date &d)
+{
+  char divider = '-';
+  int year = d.GetYear();
+  if (year < 0) {
+    ostr << divider;
+    year = year * -1;
+  }
+  ostr << setw(4) << setfill('0') << year
+    << divider << setw(2) << setfill('0') << d.GetMonth()
+    << divider << setw(2) << setfill('0') << d.GetDay();
   return ostr;
 }
 
-istream& operator>>(istream& istr, Date& d) {
-  char divider = '-'; 
+istream &operator>>(istream &istr, Date &d)
+{
+  char divider = '-';
   int new_year, new_month;
-  int new_day = -1000;
+  int new_day = -999999;
   char div1, div2;
   string input;
   getline(istr, input, ' ');
+  if (input.find_first_not_of("0123456789+-") != input.npos || input.size() == 0)
+  {
+    throw runtime_error("Wrong date format: " + input);
+  }
   stringstream date(input);
   date >> new_year >> div1 >> new_month >> div2 >> new_day;
-  if (div1 == divider && div2 == divider && new_day != -1000) {
+  if (div1 == divider && div2 == divider && new_day != -999999)
+  {
     d = {new_year, new_month, new_day};
   } else {
     throw runtime_error("Wrong date format: " + input);
@@ -64,40 +84,52 @@ istream& operator>>(istream& istr, Date& d) {
   return istr;
 }
 
-bool operator<(const Date& lhs, const Date& rhs) {
+bool operator<(const Date &lhs, const Date &rhs)
+{
   int rYear = rhs.GetYear();
   int lYear = lhs.GetYear();
-  if (rYear < lYear) {
+  if (lYear < rYear)
+  {
     return true;
-  } else if (rYear > lYear) {
+  }
+  else if (lYear > rYear)
+  {
     return false;
   }
   int lMonth = lhs.GetMonth();
   int rMonth = rhs.GetMonth();
-  if (lMonth < rMonth) {
+  if (lMonth < rMonth)
+  {
     return true;
-  } else if (lMonth > rMonth) {
+  }
+  else if (lMonth > rMonth)
+  {
     return false;
   }
-  return rhs.GetDay() < lhs.GetDay(); 
-
+  return lhs.GetDay() < rhs.GetDay();
 }
 
-class Database {
+class Database
+{
 public:
-  void AddEvent(const Date& date, const string& event) {
+  void AddEvent(const Date &date, const string &event)
+  {
     events[date].insert(event);
   }
-  bool DeleteEvent(const Date& date, const string& event) {
+  bool DeleteEvent(const Date &date, const string &event)
+  {
     auto cur = events.find(date);
 
-    if (cur != events.end()) {
-      auto& date_events = cur->second;
+    if (cur != events.end())
+    {
+      auto &date_events = cur->second;
       int ev = date_events.count(event);
-      if (ev != 0) {
+      if (ev != 0)
+      {
         date_events.erase(event);
         cout << "Deleted successfully" << endl;
-        if (date_events.size() == 0) {
+        if (date_events.size() == 0)
+        {
           events.erase(date);
         }
         return true;
@@ -106,11 +138,13 @@ public:
     cout << "Event not found" << endl;
     return false;
   }
-  int DeleteDate(const Date& date) {
+  int DeleteDate(const Date &date)
+  {
     auto cur = events.find(date);
     int size = 0;
 
-    if (cur != events.end()) {
+    if (cur != events.end())
+    {
       size = cur->second.size();
       events.erase(date);
     }
@@ -118,64 +152,95 @@ public:
     return size;
   }
 
-  void Find(const Date& date) const {
+  void Find(const Date &date) const
+  {
     auto cur = events.find(date);
 
-    if (cur != events.end()) {
-      for (auto c : cur->second) {
+    if (cur != events.end())
+    {
+      for (auto c : cur->second)
+      {
         cout << c << endl;
       }
     }
   }
-  
-  void Print() const {
-    for (auto [date, evs] : events) {
-      cout << date;
-      for (auto e : evs) {
-        cout << ' ' << e;
+
+  void Print() const
+  {
+    for (auto [date, evs] : events)
+    {
+      for (auto e : evs)
+      {
+        cout << date << ' ' << e << endl;
       }
-      cout << endl;
     }
   }
+
 private:
   map<Date, set<string>> events;
-
 };
 
-int main() {
+void ProcessDate(Date &d)
+{
+}
+
+int main()
+{
   Date inDate;
   Database db;
   string cmd, event;
-    
   string command;
-  while (getline(cin, command)) {
+  while (getline(cin, command))
+  {
     cmd = "";
     event = "";
     stringstream cur(command);
     getline(cur, cmd, ' ');
-    if (cmd == "Print") {
+    if (cmd.size() == 0)
+    {
+      continue;
+    }
+    if (cmd == "Print")
+    {
       db.Print();
       continue;
     }
-    try{
-      cur >> inDate;
-    } catch (runtime_error& ex) {
+    try
+    {
+      if (cmd == "Add")
+      {
+        cur >> inDate;
+        cur >> event;
+        db.AddEvent(inDate, event);
+      }
+      else if (cmd == "Find")
+      {
+        cur >> inDate;
+        cur >> event;
+        db.Find(inDate);
+      }
+      else if (cmd == "Del")
+      {
+        cur >> inDate;
+        cur >> event;
+        if (event.size() == 0)
+        {
+          db.DeleteDate(inDate);
+        }
+        else
+        {
+          db.DeleteEvent(inDate, event);
+        }
+      }
+      else if (cmd.size() > 0)
+      {
+        cout << "Unknown command: " << cmd << endl;
+      }
+    }
+    catch (runtime_error &ex)
+    {
       cout << ex.what() << endl;
       continue;
-    }
-    cur >> event;
-    if (cmd == "Add") {
-      db.AddEvent(inDate, event);
-    } else if (cmd == "Find") {
-      db.Find(inDate);
-    } else if (cmd == "Del") {
-      if (event.size() == 0) {
-        db.DeleteDate(inDate);
-      } else {
-        db.DeleteEvent(inDate, event);
-      }
-    } else if (cmd.size() > 0) {
-      cout << "Unknown command: " << cmd << endl;
     }
     /*
 Add 0-+1-2 event1
