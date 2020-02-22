@@ -16,7 +16,7 @@ string AskTimeServer() {
 
 class TimeServer {
 public:
-    string GetCurrentTime() {
+  string GetCurrentTime() {
         try {
             last_fetched_time = AskTimeServer();
         } catch(system_error& e) {
