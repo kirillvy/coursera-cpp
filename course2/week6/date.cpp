@@ -38,17 +38,17 @@ Date ParseDate(istream &in)
   Date d;
   char divider = '-';
   int new_year, new_month;
-  int new_day = -999999;
+  int new_day = 0;
   char div1, div2;
   string input;
-  getline(in, input, ' ');
+  in >> input;
   if (input.find_first_not_of("0123456789+-") != input.npos || input.size() == 0)
   {
     throw runtime_error("Wrong date format: " + input);
   }
   stringstream date(input);
   date >> new_year >> div1 >> new_month >> div2 >> new_day;
-  if (div1 == divider && div2 == divider && new_day != -999999)
+  if (div1 == divider && div2 == divider && new_day != 0)
   {
     d = {new_year, new_month, new_day};
   }
@@ -101,3 +101,25 @@ bool operator<(const Date &lhs, const Date &rhs)
   return lhs.GetDay() < rhs.GetDay();
 }
 
+bool operator>(const Date& lhs, const Date& rhs){
+    return (rhs < lhs);
+}
+
+bool operator>=(const Date& lhs, const Date& rhs){
+    return !(lhs < rhs);
+}
+bool operator<=(const Date& lhs, const Date& rhs){
+    return !(lhs > rhs);
+}
+
+bool operator==(const Date& lhs, const Date& rhs){
+    return (
+      lhs.GetDay() == rhs.GetDay() &&
+      lhs.GetMonth() == rhs.GetMonth() &&
+      lhs.GetYear() == rhs.GetYear()
+    );
+}
+
+bool operator!=(const Date& lhs, const Date& rhs){
+    return !(lhs == rhs);
+}

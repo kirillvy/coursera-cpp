@@ -1,25 +1,32 @@
+#pragma once
+
 #include "date.h"
 
 #include <vector>
 #include <map>
 #include <string>
 #include <set>
+#include <algorithm>
+
+#include <functional>
 
 using namespace std;
+
+using Condition = function<bool (const Date &, const string &)>;
 
 class Database {
 public:
   void Add(const Date& date, const string& event);
-  void Print(ostream& out);
-  string Last(const Date& date);
-  template<class Condition>
-  vector<string> FindIf(Condition predicate);
-  template<class Condition>
+  void Print(ostream& out) const;
+  string Last(const Date date) const;
+  vector<string> FindIf(const Condition& predicate) const;
   int RemoveIf(Condition predicate);
 
 private:
-  bool DeleteEvent(const Date &date, const string &event);
-  int DeleteDate(const Date &date);
-  void FindDate(const Date &date) const;
-  map<Date, set<string>> events;
+  int findIntersection(set<int>& date, set<int>& event) const;
+  void DeleteEvent(const int index);
+  int last = 0;
+  map<int, pair<Date, string>> events;
+  map<Date, set<int>> dates_events;
+  map<string, set<int>> events_dates;
 };

@@ -2,18 +2,15 @@
 #include "date.h"
 #include "condition_parser.h"
 #include "node.h"
-#include "test_runner.h"
 
-#include <iostream>
 #include <iomanip>
-#include <stdexcept>
 
 using namespace std;
 
 string ParseEvent(istream& is) {
   // Реализуйте эту функцию
   string res;
-  getline(is, res);
+  getline(is >> ws, res);
   return res;
 }
 

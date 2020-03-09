@@ -26,3 +26,8 @@ Date ParseDate(istream& in);
 ostream &operator<<(ostream &ostr, const Date &d);
 
 bool operator<(const Date &lhs, const Date &rhs);
+bool operator<=(const Date &lhs, const Date &rhs);
+bool operator>(const Date& lhs, const Date& rhs);
+bool operator>=(const Date& lhs, const Date& rhs);
+bool operator==(const Date& lhs, const Date& rhs);
+bool operator!=(const Date& lhs, const Date& rhs);
