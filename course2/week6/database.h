@@ -23,10 +23,9 @@ public:
   int RemoveIf(Condition predicate);
 
 private:
-  int findIntersection(set<int>& date, set<int>& event) const;
   void DeleteEvent(const int index);
   int last = 0;
   map<int, pair<Date, string>> events;
   map<Date, set<int>> dates_events;
-  map<string, set<int>> events_dates;
+  set<pair<Date, string>> events_unique;
 };

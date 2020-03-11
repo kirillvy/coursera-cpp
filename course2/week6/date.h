@@ -23,6 +23,7 @@ private:
 
 Date ParseDate(istream& in);
 
+string PrintDate(const Date &d);
 ostream &operator<<(ostream &ostr, const Date &d);
 
 bool operator<(const Date &lhs, const Date &rhs);

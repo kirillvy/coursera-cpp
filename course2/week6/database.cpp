@@ -1,54 +1,72 @@
 #include "database.h"
 
-
-int Database::findIntersection(set<int>& date, set<int>& event) const {
-  vector<int> result = {-1};
-  set_intersection(begin(date), end(date), begin(event), end(event), begin(result));
-  return result[0];
-}
-
-
 void Database::Add(const Date &date, const string &event)
 {
-  try {
-    int res = findIntersection(
-      dates_events.at(date),
-      events_dates.at(event)
-      );
-    if (res != -1) {
-      return;
-    }
-  } catch (out_of_range) {}
+  auto ev = make_pair(date, event);
+  if(events_unique.count(ev)) {
+    return;
+  }
   dates_events[date].insert(last);
-  events_dates[event].insert(last);
+  events_unique.insert(ev);
   events[last] = make_pair(date, event);
   ++last;
 }
 
 int Database::RemoveIf(Condition predicate) {
   int total = 0;
-  for (auto [index, entry] : events) {
-    const auto [date, event] = entry;
-    if (predicate(date, event)) {
-      dates_events[date].erase(index);
-      events_dates[event].erase(index);
-      events.erase(index);
-      ++total;
-    }
+  for (auto it = begin(events); it != end(events);) {
+      auto index = it->first;
+      auto entry = it->second;
+      const auto [date, event] = entry;
+      if (predicate(date, event)) {
+        dates_events[date].erase(index);
+        if (dates_events[date].size() == 0)
+          dates_events.erase(date);
+        events_unique.erase(entry);
+        it = events.erase(it);
+        ++total;
+      } else {
+        ++it;
+      }
   }
   return total;
 }
 
+
+// int Database::RemoveIf(Condition predicate) {
+//   int total = 0;
+//   map<int, pair<Date, string>> indices;
+//   for (auto [index, entry] : events) {
+
+//       const auto [date, event] = entry;
+//       if (predicate(date, event)) {
+//         indices[index] = entry;
+//         ++total;
+//       }
+//   }
+  
+//   for (auto [index, entry] : indices) {
+
+//       const auto [date, event] = entry;
+//       dates_events[date].erase(index);
+//       if (dates_events[date].size() == 0)
+//         dates_events.erase(date);
+//       events_unique.erase(entry);
+//       events.erase(index);
+//   }
+//   return total;
+// }
+
 vector<string> Database::FindIf(const Condition& predicate) const {
   vector<string> result;
-  stringstream temp;
-  for (auto [index, event] : events) {
-    auto [date, desc] = event;
-
-    if (predicate(date, desc)) {
-      temp << date << ' ' << desc;
-      result.push_back(temp.str());
-      temp.clear();
+  for (auto [key, val] : dates_events) {
+    for (auto i : val) {
+      auto [date, event] = events.at(i);
+      if (predicate(date, event)) {
+          result.push_back(
+            PrintDate(date) + " " + event
+          );
+      }
     }
   }
   return result;
@@ -57,25 +75,30 @@ vector<string> Database::FindIf(const Condition& predicate) const {
 void Database::Print(ostream& out) const {
   for (auto [key, val] : dates_events) {
     for (auto i : val) {
-      auto [date, event] = events.at(i);
-      out << date << ' ' << event << endl;
+        auto [date, event] = events.at(i);
+        out << PrintDate(date) << ' ' << event << endl;
     }
   }
 }
 
 string Database::Last(const Date date) const {
-  int index = -1;
-  for (auto c : dates_events) {
-    if (c.first <= date) {
-      index = *c.second.rbegin();
-    } else {
-      break;
-    }
-  }
-  if (index == -1)
+  if (dates_events.size() == 0) {
     return "No entries";
-  stringstream temp;
-  auto [rdate, desc] = events.at(index);
-  temp << rdate << ' ' << desc;
-  return temp.str();
+  }
+  auto it = dates_events.lower_bound(date);
+  if (it == end(dates_events) || (
+    it->first > date &&
+    it != begin(dates_events)
+  )) {
+    --it;
+  }
+  if (it->first <= date) {
+    auto res = *it;
+    auto index = *res.second.rbegin();
+    auto [rdate, desc] = events.at(index);
+    return PrintDate(rdate) + " " + desc;
+  } else {
+    return "No entries";
+  }
+
 }

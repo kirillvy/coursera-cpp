@@ -60,9 +60,9 @@ Date ParseDate(istream &in)
   return d;
 }
 
-
-ostream &operator<<(ostream &ostr, const Date &d)
+string PrintDate(const Date &d)
 {
+  stringstream ostr;
   char divider = '-';
   int year = d.GetYear();
   if (year < 0) {
@@ -72,6 +72,11 @@ ostream &operator<<(ostream &ostr, const Date &d)
   ostr << setw(4) << setfill('0') << year
     << divider << setw(2) << setfill('0') << d.GetMonth()
     << divider << setw(2) << setfill('0') << d.GetDay();
+  return ostr.str();
+}
+
+ostream &operator<<(ostream &ostr, const Date &d) {
+  ostr << PrintDate(d);
   return ostr;
 }
 

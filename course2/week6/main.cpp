@@ -8,7 +8,6 @@
 using namespace std;
 
 string ParseEvent(istream& is) {
-  // Реализуйте эту функцию
   string res;
   getline(is >> ws, res);
   return res;
